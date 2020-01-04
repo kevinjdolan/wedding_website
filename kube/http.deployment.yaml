@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: wedding-http
-        image: gcr.io/deepthought-collective/wedding-http:$REVISION_ID
+        image: gcr.io/deepthought-collective/wedding-http:1
         ports:
         - containerPort: 80

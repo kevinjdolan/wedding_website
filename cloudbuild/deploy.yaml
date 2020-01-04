@@ -16,5 +16,17 @@ steps:
   - '--image=gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
   - '--location=us-central1-a'
   - '--cluster=deepthought'
+- name: 'gcr.io/cloud-builders/gke-deploy:stable'
+  args:
+  - 'run'
+  - '--filename=kube/http.ingress.yaml'
+  - '--location=us-central1-a'
+  - '--cluster=deepthought'
+- name: 'gcr.io/cloud-builders/gke-deploy:stable'
+  args:
+  - 'run'
+  - '--filename=kube/http.service.yaml'
+  - '--location=us-central1-a'
+  - '--cluster=deepthought'
 images:
 - 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'

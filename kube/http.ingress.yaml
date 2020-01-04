@@ -1,0 +1,12 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: wedding-http
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: wedding-http
+  labels:
+    app: wedding-http
+spec:
+  backend:
+    serviceName: wedding-http
+    servicePort: 80

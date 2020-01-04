@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wedding-http
+  labels:
+    app: wedding-http
+spec:
+  type: ClusterIP
+  selector:
+    app: wedding-http
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

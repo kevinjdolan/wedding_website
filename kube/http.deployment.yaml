@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wedding-http
+  labels:
+    app: wedding-http
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wedding-http
+  template:
+    metadata:
+      labels:
+        app: wedding-http
+    spec:
+      containers:
+      - name: wedding-http
+        image: gcr.io/deepthought-collective/wedding-http:$REVISION_ID
+        ports:
+        - containerPort: 80

@@ -18,13 +18,13 @@ steps:
   - '--cluster=deepthought'
 - name: 'gcr.io/cloud-builders/gke-deploy:stable'
   args:
-  - 'run'
+  - 'apply'
   - '--filename=kube/http.ingress.yaml'
   - '--location=us-central1-a'
   - '--cluster=deepthought'
 - name: 'gcr.io/cloud-builders/gke-deploy:stable'
   args:
-  - 'run'
+  - 'apply'
   - '--filename=kube/http.service.yaml'
   - '--location=us-central1-a'
   - '--cluster=deepthought'

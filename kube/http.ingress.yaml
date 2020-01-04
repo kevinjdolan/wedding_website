@@ -7,6 +7,11 @@ metadata:
   labels:
     app: wedding-http
 spec:
+  tls:
+  - hosts:
+    - amatchmadeinkevin.com
+    - www.amatchmadeinkevin.com
+    secretName: tls.amatchmadeinkevin
   backend:
     serviceName: wedding-http
     servicePort: 80

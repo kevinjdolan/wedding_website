@@ -187,6 +187,8 @@ section iframe {
 
   #main {
     padding-top: 20px;
+    width: 100%;
+    overflow: hidden;
   }
 
   section {

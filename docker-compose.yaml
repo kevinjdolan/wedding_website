@@ -16,3 +16,6 @@ services:
     - type: bind
       source: ./nginx
       target: /etc/nginx
+    - type: bind
+      source: ./config.yaml
+      target: /secret/config.yaml

@@ -5,6 +5,8 @@ steps:
   - 'build'
   - '-t'
   - 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
+  - '-f'
+  - './nginx/Dockerfile'
   - '.'
   waitFor:
   - '-'
@@ -15,7 +17,8 @@ steps:
   - 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
   waitFor:
   - docker-build
-- name: 'gcr.io/cloud-builders/gke-deploy:stable'
+- id: kube-deployment
+  name: 'gcr.io/cloud-builders/gke-deploy:stable'
   args:
   - 'run'
   - '--filename=kube/http.deployment.yaml'
@@ -24,7 +27,8 @@ steps:
   - '--cluster=deepthought'
   waitFor:
   - docker-push
-- name: 'gcr.io/cloud-builders/gke-deploy:stable'
+- id: kube-ingress
+  name: 'gcr.io/cloud-builders/gke-deploy:stable'
   args:
   - 'apply'
   - '--filename=kube/http.ingress.yaml'
@@ -32,7 +36,8 @@ steps:
   - '--cluster=deepthought'
   waitFor:
   - docker-push
-- name: 'gcr.io/cloud-builders/gke-deploy:stable'
+- id: kube-service
+  name: 'gcr.io/cloud-builders/gke-deploy:stable'
   args:
   - 'apply'
   - '--filename=kube/http.service.yaml'

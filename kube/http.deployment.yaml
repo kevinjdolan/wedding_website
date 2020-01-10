@@ -19,7 +19,7 @@ spec:
         image: gcr.io/deepthought-collective/wedding-http:1
         ports:
         - containerPort: 80
-          volumeMounts:
+        volumeMounts:
         - name: config
           mountPath: "/secret"
           readOnly: true

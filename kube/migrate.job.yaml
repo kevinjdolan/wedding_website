@@ -3,23 +3,18 @@ kind: Job
 metadata:
   name: {JOBNAME}
 spec:
-  backoffLimit: 0
+  backoffLimit: 4
   template:
     spec:
-      template:
-        spec:
-          containers:
-          - name: wedding-migrate
-            image: gcr.io/deepthought-collective/wedding-migrate:{TAG}
-            volumeMounts:
-            - name: config
-              mountPath: "/secret"
-              readOnly: true
-          restartPolicy: Never
-          volumes:
-          - name: config
-            secret:
-              secretName: wedding
-        metadata:
-          labels:
-            app: wedding-migrate
+      containers:
+      - name: wedding-migrate
+        image: gcr.io/deepthought-collective/wedding-migrate:{TAG}
+        volumeMounts:
+        - name: config
+          mountPath: "/secret"
+          readOnly: true
+      restartPolicy: Never
+      volumes:
+      - name: config
+        secret:
+          secretName: wedding

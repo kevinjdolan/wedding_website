@@ -1,0 +1,28 @@
+version: "3.7"
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: db
+      PGDATA: /data
+    volumes:
+    - 'postgres:/data'
+    logging:
+      driver: none
+  nginx:
+    build:
+      context: ./
+      dockerfile: ./nginx/Dockerfile
+    ports:
+    - target: 80
+      published: 8281
+      protocol: tcp
+      mode: host
+    volumes:
+    - './site:/app/site'
+    - './nginx:/etc/nginx'
+    - './config.yaml:/secret/config.yaml'
+volumes:
+  postgres:

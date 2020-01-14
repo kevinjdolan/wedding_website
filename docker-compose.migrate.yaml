@@ -1,0 +1,10 @@
+version: "3.7"
+services:
+  migrate:
+    build:
+      context: ./
+      dockerfile: ./migrate/Dockerfile
+    volumes:
+    - type: bind
+      source: ./config.yaml
+      target: /secret/config.yaml

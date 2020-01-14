@@ -1,90 +1,94 @@
 steps:
 
-# DOCKER BUILD & PUSH WEB
-- id: docker-build-web
-  name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
-  - '-t'
-  - 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
-  - '-f'
-  - './nginx/Dockerfile'
-  - '.'
-  waitFor:
-  - '-'
-- id: docker-push-web
-  name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'push'
-  - 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
-  waitFor:
-  - docker-build-web
-
-# DOCKER BUILD & PUSH MIGRATE
-- id: docker-build-migrate
-  name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
-  - '-t'
-  - 'gcr.io/$PROJECT_ID/wedding-migrate:$REVISION_ID'
-  - '-f'
-  - './migrate/Dockerfile'
-  - '.'
-  waitFor:
-  - '-'
-- id: docker-push-migrate
-  name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'push'
-  - 'gcr.io/$PROJECT_ID/wedding-migrate:$REVISION_ID'
-  waitFor:
-  - docker-build-migrate
-
-# KUBE SUPPORTS
-- id: kube-ingress
-  name: 'gcr.io/cloud-builders/gke-deploy:stable'
-  args:
-  - 'apply'
-  - '--filename=kube/http.ingress.yaml'
-  - '--location=us-central1-a'
-  - '--cluster=deepthought'
-  waitFor:
-  - docker-push-web
-  - docker-push-migrate
-- id: kube-service
-  name: 'gcr.io/cloud-builders/gke-deploy:stable'
-  args:
-  - 'apply'
-  - '--filename=kube/http.service.yaml'
-  - '--location=us-central1-a'
-  - '--cluster=deepthought'
-  waitFor:
-  - docker-push-web
-  - docker-push-migrate
+# # DOCKER BUILD & PUSH WEB
+# - id: docker-build-web
+#   name: 'gcr.io/cloud-builders/docker'
+#   args:
+#   - 'build'
+#   - '-t'
+#   - 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
+#   - '-f'
+#   - './nginx/Dockerfile'
+#   - '.'
+#   waitFor:
+#   - '-'
+# - id: docker-push-web
+#   name: 'gcr.io/cloud-builders/docker'
+#   args:
+#   - 'push'
+#   - 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
+#   waitFor:
+#   - docker-build-web
+#
+# # DOCKER BUILD & PUSH MIGRATE
+# - id: docker-build-migrate
+#   name: 'gcr.io/cloud-builders/docker'
+#   args:
+#   - 'build'
+#   - '-t'
+#   - 'gcr.io/$PROJECT_ID/wedding-migrate:$REVISION_ID'
+#   - '-f'
+#   - './migrate/Dockerfile'
+#   - '.'
+#   waitFor:
+#   - '-'
+# - id: docker-push-migrate
+#   name: 'gcr.io/cloud-builders/docker'
+#   args:
+#   - 'push'
+#   - 'gcr.io/$PROJECT_ID/wedding-migrate:$REVISION_ID'
+#   waitFor:
+#   - docker-build-migrate
+#
+# # KUBE SUPPORTS
+# - id: kube-ingress
+#   name: 'gcr.io/cloud-builders/gke-deploy:stable'
+#   args:
+#   - 'apply'
+#   - '--filename=kube/http.ingress.yaml'
+#   - '--location=us-central1-a'
+#   - '--cluster=deepthought'
+#   waitFor:
+#   - docker-push-web
+#   - docker-push-migrate
+# - id: kube-service
+#   name: 'gcr.io/cloud-builders/gke-deploy:stable'
+#   args:
+#   - 'apply'
+#   - '--filename=kube/http.service.yaml'
+#   - '--location=us-central1-a'
+#   - '--cluster=deepthought'
+#   waitFor:
+#   - docker-push-web
+#   - docker-push-migrate
 
 # MIGRATION
 - id: migrate
   name: 'gcr.io/$PROJECT_ID/run-kube-job:latest'
   args:
   - 'hi'
-  waitFor:
-  - docker-push-web
-  - docker-push-migrate
+  env:
+  - PROJECT=$PROJECT_ID
+  - ZONE=us-central1-a
+  - CLUSTER=deepthought
+  # waitFor:
+  # - docker-push-web
+  # - docker-push-migrate
 
-# KUBE DEPLOYMENTS
-- id: kube-deployment
-  name: 'gcr.io/cloud-builders/gke-deploy:stable'
-  args:
-  - 'run'
-  - '--filename=kube/http.deployment.yaml'
-  - '--image=gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
-  - '--location=us-central1-a'
-  - '--cluster=deepthought'
-  waitFor:
-  - docker-push-web
-  - docker-push-migrate
-  - kube-ingress
-  - kube-service
+# # KUBE DEPLOYMENTS
+# - id: kube-deployment
+#   name: 'gcr.io/cloud-builders/gke-deploy:stable'
+#   args:
+#   - 'run'
+#   - '--filename=kube/http.deployment.yaml'
+#   - '--image=gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
+#   - '--location=us-central1-a'
+#   - '--cluster=deepthought'
+#   waitFor:
+#   - docker-push-web
+#   - docker-push-migrate
+#   - kube-ingress
+#   - kube-service
 
 images:
 - 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'

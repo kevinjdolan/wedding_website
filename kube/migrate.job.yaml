@@ -4,8 +4,8 @@ metadata:
   name: {JOBNAME}
 spec:
   template:
+    backoffLimit: 0
     spec:
-      backoffLimit: 0
       template:
         spec:
           containers:

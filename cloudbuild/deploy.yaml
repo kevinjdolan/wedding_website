@@ -62,6 +62,15 @@ steps:
   - docker-push-web
   - docker-push-migrate
 
+# MIGRATION
+- id: migrate
+  name: 'gcr.io/$PROJECT_ID/run-kube-job:latest'
+  args:
+  - 'hi'
+  waitFor:
+  - docker-push-web
+  - docker-push-migrate
+
 # KUBE DEPLOYMENTS
 - id: kube-deployment
   name: 'gcr.io/cloud-builders/gke-deploy:stable'
@@ -79,4 +88,3 @@ steps:
 
 images:
 - 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
-- 'gcr.io/$PROJECT_ID/wedding-migrate:$REVISION_ID'

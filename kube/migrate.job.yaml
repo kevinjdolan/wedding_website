@@ -3,9 +3,9 @@ kind: Job
 metadata:
   name: {JOBNAME}
 spec:
-  jobTemplate:
+  template:
     spec:
-      backoffLimit: 1
+      backoffLimit: 0
       template:
         spec:
           containers:

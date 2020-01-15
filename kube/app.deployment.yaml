@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wedding-app
+  labels:
+    app: wedding-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wedding-app
+  template:
+    metadata:
+      labels:
+        app: wedding-app
+    spec:
+      containers:
+      - name: wedding-app
+        image: gcr.io/deepthought-collective/wedding-app:1
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: config
+          mountPath: "/secret"
+          readOnly: true
+      volumes:
+      - name: config
+        secret:
+          secretName: wedding

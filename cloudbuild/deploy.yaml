@@ -1,25 +1,25 @@
 steps:
 
-# # DOCKER BUILD & PUSH WEB
-# - id: docker-build-web
-#   name: 'gcr.io/cloud-builders/docker'
-#   args:
-#   - 'build'
-#   - '-t'
-#   - 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
-#   - '-f'
-#   - './nginx/Dockerfile'
-#   - '.'
-#   waitFor:
-#   - '-'
-# - id: docker-push-web
-#   name: 'gcr.io/cloud-builders/docker'
-#   args:
-#   - 'push'
-#   - 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
-#   waitFor:
-#   - docker-build-web
-#
+# DOCKER BUILD & PUSH WEB
+- id: docker-build-web
+  name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '-t'
+  - 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
+  - '-f'
+  - './nginx/Dockerfile'
+  - '.'
+  waitFor:
+  - '-'
+- id: docker-push-web
+  name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'push'
+  - 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
+  waitFor:
+  - docker-build-web
+
 # DOCKER BUILD & PUSH MIGRATE
 - id: docker-build-migrate
   name: 'gcr.io/cloud-builders/docker'
@@ -40,27 +40,60 @@ steps:
   waitFor:
   - docker-build-migrate
 
-# # KUBE SUPPORTS
-# - id: kube-ingress
-#   name: 'gcr.io/cloud-builders/gke-deploy:stable'
-#   args:
-#   - 'apply'
-#   - '--filename=kube/http.ingress.yaml'
-#   - '--location=us-central1-a'
-#   - '--cluster=deepthought'
-#   waitFor:
-#   - docker-push-web
-#   - docker-push-migrate
-# - id: kube-service
-#   name: 'gcr.io/cloud-builders/gke-deploy:stable'
-#   args:
-#   - 'apply'
-#   - '--filename=kube/http.service.yaml'
-#   - '--location=us-central1-a'
-#   - '--cluster=deepthought'
-#   waitFor:
-#   - docker-push-web
-#   - docker-push-migrate
+# DOCKER BUILD & PUSH APP
+- id: docker-build-app
+  name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '-t'
+  - 'gcr.io/$PROJECT_ID/wedding-app:$REVISION_ID'
+  - '-f'
+  - './app/Dockerfile'
+  - '.'
+  waitFor:
+  - '-'
+- id: docker-push-app
+  name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'push'
+  - 'gcr.io/$PROJECT_ID/wedding-app:$REVISION_ID'
+  waitFor:
+  - docker-build-app
+
+# KUBE SUPPORTS
+- id: kube-http-ingress
+  name: 'gcr.io/cloud-builders/gke-deploy:stable'
+  args:
+  - 'apply'
+  - '--filename=kube/http.ingress.yaml'
+  - '--location=us-central1-a'
+  - '--cluster=deepthought'
+  waitFor:
+  - docker-push-web
+  - docker-push-migrate
+  - docker-push-app
+- id: kube-http-service
+  name: 'gcr.io/cloud-builders/gke-deploy:stable'
+  args:
+  - 'apply'
+  - '--filename=kube/http.service.yaml'
+  - '--location=us-central1-a'
+  - '--cluster=deepthought'
+  waitFor:
+  - docker-push-web
+  - docker-push-migrate
+  - docker-push-app
+- id: kube-app-service
+  name: 'gcr.io/cloud-builders/gke-deploy:stable'
+  args:
+  - 'apply'
+  - '--filename=kube/app.service.yaml'
+  - '--location=us-central1-a'
+  - '--cluster=deepthought'
+  waitFor:
+  - docker-push-web
+  - docker-push-migrate
+  - docker-push-app
 
 # MIGRATION
 - id: migrate
@@ -74,23 +107,32 @@ steps:
   - TAG=$REVISION_ID
   waitFor:
   - docker-push-migrate
-  # - docker-push-web
+  - docker-push-web
+  - docker-push-app
 
 # # KUBE DEPLOYMENTS
-# - id: kube-deployment
-#   name: 'gcr.io/cloud-builders/gke-deploy:stable'
-#   args:
-#   - 'run'
-#   - '--filename=kube/http.deployment.yaml'
-#   - '--image=gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
-#   - '--location=us-central1-a'
-#   - '--cluster=deepthought'
-#   waitFor:
-#   - docker-push-web
-#   - docker-push-migrate
-#   - kube-ingress
-#   - kube-service
+- id: kube-http-deployment
+  name: 'gcr.io/cloud-builders/gke-deploy:stable'
+  args:
+  - 'run'
+  - '--filename=kube/http.deployment.yaml'
+  - '--image=gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
+  - '--location=us-central1-a'
+  - '--cluster=deepthought'
+  waitFor:
+  - migrate
+- id: kube-app-deployment
+  name: 'gcr.io/cloud-builders/gke-deploy:stable'
+  args:
+  - 'run'
+  - '--filename=kube/app.deployment.yaml'
+  - '--image=gcr.io/$PROJECT_ID/wedding-app:$REVISION_ID'
+  - '--location=us-central1-a'
+  - '--cluster=deepthought'
+  waitFor:
+  - migrate
 
 images:
-# - 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
+- 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
 - 'gcr.io/$PROJECT_ID/wedding-migrate:$REVISION_ID'
+- 'gcr.io/$PROJECT_ID/wedding-app:$REVISION_ID'

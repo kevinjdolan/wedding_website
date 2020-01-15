@@ -5,8 +5,7 @@ metadata:
   labels:
     app: wedding-app
 spec:
-  type: ExternalName
-  externalName: weddingapp.cluster
+  type: NodePort
   selector:
     app: wedding-app
   ports:

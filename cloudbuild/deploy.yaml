@@ -1,7 +1,7 @@
 steps:
 
 # DOCKER BUILD & PUSH WEB
-- id: docker-build-web
+- id: docker-build-http
   name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
@@ -12,13 +12,13 @@ steps:
   - '.'
   waitFor:
   - '-'
-- id: docker-push-web
+- id: docker-push-http
   name: 'gcr.io/cloud-builders/docker'
   args:
   - 'push'
   - 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
   waitFor:
-  - docker-build-web
+  - docker-build-http
 
 # DOCKER BUILD & PUSH MIGRATE
 - id: docker-build-migrate
@@ -69,7 +69,7 @@ steps:
   - '--location=us-central1-a'
   - '--cluster=deepthought'
   waitFor:
-  - docker-push-web
+  - docker-push-http
   - docker-push-migrate
   - docker-push-app
 - id: kube-http-service
@@ -80,7 +80,7 @@ steps:
   - '--location=us-central1-a'
   - '--cluster=deepthought'
   waitFor:
-  - docker-push-web
+  - docker-push-http
   - docker-push-migrate
   - docker-push-app
 - id: kube-app-service
@@ -91,7 +91,7 @@ steps:
   - '--location=us-central1-a'
   - '--cluster=deepthought'
   waitFor:
-  - docker-push-web
+  - docker-push-http
   - docker-push-migrate
   - docker-push-app
 
@@ -107,10 +107,10 @@ steps:
   - TAG=$REVISION_ID
   waitFor:
   - docker-push-migrate
-  - docker-push-web
+  - docker-push-http
   - docker-push-app
 
-# # KUBE DEPLOYMENTS
+# KUBE DEPLOYMENTS
 - id: kube-http-deployment
   name: 'gcr.io/cloud-builders/gke-deploy:stable'
   args:
@@ -119,6 +119,7 @@ steps:
   - '--image=gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
   - '--location=us-central1-a'
   - '--cluster=deepthought'
+  - '--output=./output/http'
   waitFor:
   - migrate
 - id: kube-app-deployment
@@ -129,6 +130,7 @@ steps:
   - '--image=gcr.io/$PROJECT_ID/wedding-app:$REVISION_ID'
   - '--location=us-central1-a'
   - '--cluster=deepthought'
+  - '--output=./output/app'
   waitFor:
   - migrate
 

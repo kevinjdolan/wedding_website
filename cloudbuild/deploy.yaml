@@ -61,33 +61,11 @@ steps:
   - docker-build-app
 
 # KUBE SUPPORTS
-- id: kube-http-ingress
+- id: kube-infrastructure
   name: 'gcr.io/cloud-builders/gke-deploy:stable'
   args:
   - 'apply'
-  - '--filename=kube/http.ingress.yaml'
-  - '--location=us-central1-a'
-  - '--cluster=deepthought'
-  waitFor:
-  - docker-push-http
-  - docker-push-migrate
-  - docker-push-app
-- id: kube-http-service
-  name: 'gcr.io/cloud-builders/gke-deploy:stable'
-  args:
-  - 'apply'
-  - '--filename=kube/http.service.yaml'
-  - '--location=us-central1-a'
-  - '--cluster=deepthought'
-  waitFor:
-  - docker-push-http
-  - docker-push-migrate
-  - docker-push-app
-- id: kube-app-service
-  name: 'gcr.io/cloud-builders/gke-deploy:stable'
-  args:
-  - 'apply'
-  - '--filename=kube/app.service.yaml'
+  - '--filename=kube/infrastructure/'
   - '--location=us-central1-a'
   - '--cluster=deepthought'
   waitFor:
@@ -103,7 +81,7 @@ steps:
   - ZONE=us-central1-a
   - CLUSTER=deepthought
   - NAME=wedding-migrate
-  - SPEC=./kube/migrate.job.yaml
+  - SPEC=./kube/app/migrate.job.yaml
   - TAG=$REVISION_ID
   waitFor:
   - docker-push-migrate
@@ -115,7 +93,7 @@ steps:
   name: 'gcr.io/cloud-builders/gke-deploy:stable'
   args:
   - 'run'
-  - '--filename=kube/http.deployment.yaml'
+  - '--filename=kube/app/http.deployment.yaml'
   - '--image=gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
   - '--location=us-central1-a'
   - '--cluster=deepthought'
@@ -126,7 +104,7 @@ steps:
   name: 'gcr.io/cloud-builders/gke-deploy:stable'
   args:
   - 'run'
-  - '--filename=kube/app.deployment.yaml'
+  - '--filename=kube/app/app.deployment.yaml'
   - '--image=gcr.io/$PROJECT_ID/wedding-app:$REVISION_ID'
   - '--location=us-central1-a'
   - '--cluster=deepthought'

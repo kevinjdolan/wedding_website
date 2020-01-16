@@ -1,0 +1,8 @@
+apiVersion: dns.cnrm.cloud.google.com/v1alpha1
+kind: DNSManagedZone
+metadata:
+  name: amatchmadeinkevin
+spec:
+  description: amatchmadeinkevin
+  dnsName: "amatchmadeinkevin.com."
+  visibility: public

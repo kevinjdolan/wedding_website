@@ -25,7 +25,7 @@ services:
     - './nginx:/etc/nginx'
     - './config.yaml:/secret/config.yaml'
     links:
-    - "app:weddingapp.cluster"
+    - "app:wedding-app"
   app:
     build:
       context: ./

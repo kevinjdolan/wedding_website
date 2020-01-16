@@ -1,2 +1,1 @@
-alembic:
-  url: postgres+psycopg2://user:password@db:5432/db
+sql: postgres+psycopg2://user:password@db:5432/db 

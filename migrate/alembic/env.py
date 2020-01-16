@@ -15,7 +15,7 @@ with open('/secret/config.yaml') as f:
     secret = yaml.safe_load(f)
     config.set_main_option(
         'sqlalchemy.url',
-        secret['alembic']['url'],
+        secret['sql'],
     )
 
 # Interpret the config file for Python logging.

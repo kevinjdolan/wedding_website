@@ -7,13 +7,12 @@ RUN apt-get update && apt-get install -y\
 RUN pip3 install\
   pyyaml\
   psycopg2\
-  flask
+  flask\
+  Flask-SQLAlchemy
 
 COPY ./app/ /app/app
 WORKDIR /app/app
 
-ENV FLASK_APP=app.py
-
 EXPOSE 80
 
-CMD ["flask", "run", "--host", "0.0.0.0", "--port", "80"]
+CMD ["python3", "-u", "/app/app/app.py"]

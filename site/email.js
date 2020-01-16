@@ -9,6 +9,8 @@ function onSubmit(ev) {
     url: '/app/submit/',
     data: data,
   })
+  $('#form-elements').hide()
+  $('#thank-you').show()
 }
 
 $(init)

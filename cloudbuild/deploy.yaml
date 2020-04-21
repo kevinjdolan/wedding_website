@@ -67,7 +67,7 @@ steps:
   - 'apply'
   - '--filename=kube/infrastructure/'
   - '--location=us-central1-a'
-  - '--cluster=deepthought'
+  - '--cluster=deepthought-nu'
   waitFor:
   - docker-push-http
   - docker-push-migrate
@@ -79,7 +79,7 @@ steps:
   env:
   - PROJECT=$PROJECT_ID
   - ZONE=us-central1-a
-  - CLUSTER=deepthought
+  - CLUSTER=deepthought-nu
   - NAME=wedding-migrate
   - SPEC=./kube/app/migrate.job.yaml
   - TAG=$REVISION_ID
@@ -96,7 +96,7 @@ steps:
   - '--filename=kube/app/http.deployment.yaml'
   - '--image=gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
   - '--location=us-central1-a'
-  - '--cluster=deepthought'
+  - '--cluster=deepthought-nu'
   - '--output=./output/http'
   waitFor:
   - migrate
@@ -107,7 +107,7 @@ steps:
   - '--filename=kube/app/app.deployment.yaml'
   - '--image=gcr.io/$PROJECT_ID/wedding-app:$REVISION_ID'
   - '--location=us-central1-a'
-  - '--cluster=deepthought'
+  - '--cluster=deepthought-nu'
   - '--output=./output/app'
   waitFor:
   - migrate

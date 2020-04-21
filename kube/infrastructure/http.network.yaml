@@ -1,0 +1,89 @@
+# resolves to: 34.107.165.88
+apiVersion: compute.cnrm.cloud.google.com/v1beta1
+kind: ComputeAddress
+metadata:
+  name: wedding-http
+spec:
+  location: global
+---
+apiVersion: dns.cnrm.cloud.google.com/v1beta1
+kind: DNSManagedZone
+metadata:
+  name: k8s-amatchmadeinkevin-com
+spec:
+  description: k8s managed
+  dnsName: "amatchmadeinkevin.com."
+  visibility: public
+---
+apiVersion: networking.gke.io/v1beta1
+kind: ManagedCertificate
+metadata:
+  name: amatchmadeinkevin-com
+spec:
+  domains:
+    - amatchmadeinkevin.com
+---
+apiVersion: networking.gke.io/v1beta1
+kind: ManagedCertificate
+metadata:
+  name: www-amatchmadeinkevin-com
+spec:
+  domains:
+    - www.amatchmadeinkevin.com
+---
+apiVersion: dns.cnrm.cloud.google.com/v1beta1
+kind: DNSRecordSet
+metadata:
+  annotations:
+    cnrm.cloud.google.com/deletion-policy: abandon
+  name: amatchmadeinkevin-com-a
+spec:
+  managedZoneRef:
+    name: amatchmadeinkevin-com
+  name: amatchmadeinkevin.com.
+  rrdatas:
+  - 34.107.165.88
+  ttl: 300
+  type: A
+---
+apiVersion: dns.cnrm.cloud.google.com/v1beta1
+kind: DNSRecordSet
+metadata:
+  annotations:
+    cnrm.cloud.google.com/deletion-policy: abandon
+  name: www-amatchmadeinkevin-com-a
+spec:
+  managedZoneRef:
+    name: amatchmadeinkevin-com
+  name: www.amatchmadeinkevin.com.
+  rrdatas:
+  - 34.107.165.88
+  ttl: 300
+  type: A
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wedding-http
+  labels:
+    app: wedding-http
+spec:
+  selector:
+    app: wedding-http
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: wedding-http
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: wedding-http
+    networking.gke.io/managed-certificates: amatchmadeinkevin-com,www-amatchmadeinkevin-com
+spec:
+  backend:
+    serviceName: wedding-http
+    servicePort: 80

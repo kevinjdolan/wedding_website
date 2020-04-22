@@ -39,7 +39,7 @@ metadata:
   name: amatchmadeinkevin-com-a
 spec:
   managedZoneRef:
-    name: amatchmadeinkevin-com
+    name: k8s-amatchmadeinkevin-com
   name: amatchmadeinkevin.com.
   rrdatas:
   - 34.107.165.88
@@ -54,7 +54,7 @@ metadata:
   name: www-amatchmadeinkevin-com-a
 spec:
   managedZoneRef:
-    name: amatchmadeinkevin-com
+    name: k8s-amatchmadeinkevin-com
   name: www.amatchmadeinkevin.com.
   rrdatas:
   - 34.107.165.88

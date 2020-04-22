@@ -84,6 +84,6 @@ steps:
   - migrate
 
 images:
-- 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
-- 'gcr.io/$PROJECT_ID/wedding-migrate:$REVISION_ID'
-- 'gcr.io/$PROJECT_ID/wedding-app:$REVISION_ID'
+- 'gcr.io/$PROJECT_ID/wedding-http'
+- 'gcr.io/$PROJECT_ID/wedding-migrate'
+- 'gcr.io/$PROJECT_ID/wedding-app'

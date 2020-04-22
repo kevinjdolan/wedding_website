@@ -1,64 +1,35 @@
 steps:
 
-# DOCKER BUILD & PUSH WEB
-- id: docker-build-http
-  name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
-  - '-t'
-  - 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
-  - '-f'
-  - './nginx/Dockerfile'
-  - '.'
+- id: build-http
+  name: 'gcr.io/$PROJECT_ID/docker-build-push-tag:$REVISION_ID'
+  env:
+  - PROJECT_ID=$PROJECT_ID
+  - REVISION_ID=$REVISION_ID
+  - IMAGE_NAME=wedding-http
+  - ROOT_PATH=.
+  - DOCKERFILE=./nginx/Dockerfile
   waitFor:
   - '-'
-- id: docker-push-http
-  name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'push'
-  - 'gcr.io/$PROJECT_ID/wedding-http:$REVISION_ID'
-  waitFor:
-  - docker-build-http
-
-# DOCKER BUILD & PUSH MIGRATE
-- id: docker-build-migrate
-  name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
-  - '-t'
-  - 'gcr.io/$PROJECT_ID/wedding-migrate:$REVISION_ID'
-  - '-f'
-  - './migrate/Dockerfile'
-  - '.'
+- id: build-migrate
+  name: 'gcr.io/$PROJECT_ID/docker-build-push-tag:$REVISION_ID'
+  env:
+  - PROJECT_ID=$PROJECT_ID
+  - REVISION_ID=$REVISION_ID
+  - IMAGE_NAME=wedding-migrate
+  - ROOT_PATH=.
+  - DOCKERFILE=./migrate/Dockerfile
   waitFor:
   - '-'
-- id: docker-push-migrate
-  name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'push'
-  - 'gcr.io/$PROJECT_ID/wedding-migrate:$REVISION_ID'
-  waitFor:
-  - docker-build-migrate
-
-# DOCKER BUILD & PUSH APP
-- id: docker-build-app
-  name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
-  - '-t'
-  - 'gcr.io/$PROJECT_ID/wedding-app:$REVISION_ID'
-  - '-f'
-  - './app/Dockerfile'
-  - '.'
+- id: build-app
+  name: 'gcr.io/$PROJECT_ID/docker-build-push-tag:$REVISION_ID'
+  env:
+  - PROJECT_ID=$PROJECT_ID
+  - REVISION_ID=$REVISION_ID
+  - IMAGE_NAME=wedding-app
+  - ROOT_PATH=.
+  - DOCKERFILE=./app/Dockerfile
   waitFor:
   - '-'
-- id: docker-push-app
-  name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'push'
-  - 'gcr.io/$PROJECT_ID/wedding-app:$REVISION_ID'
-  waitFor:
-  - docker-build-app
 
 # KUBE SUPPORTS
 - id: kube-infrastructure
@@ -69,9 +40,9 @@ steps:
   - '--location=us-central1-a'
   - '--cluster=deepthought-nu'
   waitFor:
-  - docker-push-http
-  - docker-push-migrate
-  - docker-push-app
+  - build-http
+  - build-migrate
+  - build-app
 
 # MIGRATION
 - id: migrate
@@ -84,9 +55,9 @@ steps:
   - SPEC=./kube/app/migrate.job.yaml
   - TAG=$REVISION_ID
   waitFor:
-  - docker-push-migrate
-  - docker-push-http
-  - docker-push-app
+  - build-migrate
+  - build-http
+  - build-app
 
 # KUBE DEPLOYMENTS
 - id: kube-http-deployment
